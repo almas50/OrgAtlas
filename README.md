@@ -27,5 +27,4 @@ docker-compose down
 
 ### Доступ к сервисам
 
-- **API**: http://localhost:8000
 - **Документация**: http://localhost:8000/docs
