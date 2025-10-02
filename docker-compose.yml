@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: orgatlas
+      POSTGRES_USER: orgatlas_user
+      POSTGRES_PASSWORD: orgatlas_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@orgatlas.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://orgatlas_user:orgatlas_password@postgres:5432/orgatlas
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    command: sh -c "sleep 5 && alembic upgrade head && python app/seed_data.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  postgres_data:
